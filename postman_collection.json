@@ -1,0 +1,75 @@
+{
+  "info": {
+    "name": "Lojazap-like API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\\n  \"username\":\"user1\",\\n  \"password\":\"pass\"\\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8081/auth/register",
+          "host": [
+            "http://localhost:8081"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\\n  \"username\":\"user1\",\\n  \"password\":\"pass\"\\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8081/auth/login",
+          "host": [
+            "http://localhost:8081"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Products",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8081/products",
+          "host": [
+            "http://localhost:8081"
+          ],
+          "path": [
+            "products"
+          ]
+        }
+      }
+    }
+  ]
+}
