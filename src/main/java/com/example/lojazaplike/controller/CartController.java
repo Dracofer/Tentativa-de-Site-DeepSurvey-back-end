@@ -20,32 +20,27 @@ public class CartController {
     @Autowired
     private ProductRepository productRepo;
 
-    // Buscar itens por sessionId
     @GetMapping("/{sessionId}")
     public List<CartItem> getCart(@PathVariable String sessionId) {
         return cartRepo.findBySessionId(sessionId);
     }
 
-    // Adicionar item na sessão
     @PostMapping("/add")
     public CartItem addToCart(@RequestBody CartItem item) {
 
-        // Se já existe item igual na sessão E mesmo product → atualiza
         CartItem existing = cartRepo
-            .findBySessionIdAndProductId(item.getSessionId(), item.getProduct().getId())
-            .orElse(null);
+                .findBySessionIdAndProductId(item.getSessionId(), item.getProduct().getId())
+                .orElse(null);
 
         Product p = productRepo.findById(item.getProduct().getId())
                 .orElseThrow();
 
         if (existing != null) {
-            // Atualiza quantidade
             existing.setQuantity(item.getQuantity());
             existing.setPrice(p.getPrice());
             return cartRepo.save(existing);
         }
 
-        // Se NÃO existe → cria um novo
         CartItem ci = new CartItem();
         ci.setSessionId(item.getSessionId());
         ci.setProduct(p);
@@ -60,6 +55,7 @@ public class CartController {
         Long id = ((Number)data.get("itemId")).longValue();
         cartRepo.deleteById(id);
     }
+
     @PostMapping("/update")
     public CartItem updateQuantity(@RequestBody Map<String, Object> data) {
 
@@ -73,5 +69,4 @@ public class CartController {
 
         return cartRepo.save(item);
     }
-        
-    }
+}

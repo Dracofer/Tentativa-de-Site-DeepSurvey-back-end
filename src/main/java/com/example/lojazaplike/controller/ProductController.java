@@ -23,10 +23,19 @@ public class ProductController {
     public List<Product> list() {
         return productRepository.findAll();
     }
+    @GetMapping("/search")
+    public List<Product> search(@RequestParam String q) {
+        return productRepository.findByNameContainingIgnoreCase(q);
+    }
 
     @GetMapping("/{id}")
     public Product get(@PathVariable Long id) {
         return productRepository.findById(id).orElseThrow();
+    }
+    
+    @GetMapping("/offers")
+    public List<Product> getOffers() {
+        return productRepository.findByOnSaleTrue();
     }
 
     @PostMapping
@@ -37,6 +46,10 @@ public class ProductController {
         }
         return productRepository.save(p);
     }
+    @GetMapping("/category/{id}")
+    public List<Product> getByCategory(@PathVariable Long id) {
+        return productRepository.findByCategoryId(id);
+    }
 
     @PutMapping("/{id}")
     public Product update(@PathVariable Long id, @RequestBody Product p) {
@@ -45,11 +58,14 @@ public class ProductController {
         existing.setDescription(p.getDescription());
         existing.setPrice(p.getPrice());
         existing.setStock(p.getStock());
-        existing.setImageUrl(p.getImageUrl()); // <-- CORREÇÃO AQUI
+        existing.setImageUrl(p.getImageUrl());
+        existing.setOnSale(p.getOnSale());
+        existing.setSalePrice(p.getSalePrice());
 
         if (p.getCategory() != null && p.getCategory().getId() != null) {
             existing.setCategory(categoryRepository.findById(p.getCategory().getId()).orElse(null));
         }
+        
 
         return productRepository.save(existing);
     }

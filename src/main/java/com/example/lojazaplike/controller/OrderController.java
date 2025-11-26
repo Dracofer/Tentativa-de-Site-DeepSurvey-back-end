@@ -2,60 +2,86 @@ package com.example.lojazaplike.controller;
 
 import com.example.lojazaplike.model.*;
 import com.example.lojazaplike.repository.*;
+import com.example.lojazaplike.dto.CheckoutRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/orders")
+@CrossOrigin(origins = "*")
 public class OrderController {
 
-    @Autowired private CartItemRepository cartRepo;
-    @Autowired private OrderRepository orderRepo;
-    @Autowired private OrderItemRepository orderItemRepo;
+    @Autowired
+    private CartItemRepository cartRepo;
 
-    // 🔥 FECHAR PEDIDO SEM LOGIN
+    @Autowired
+    private OrderRepository orderRepo;
+
+    @Autowired
+    private OrderItemRepository orderItemRepo;
+
+    @Autowired
+    private ProductRepository productRepo;
+
     @PostMapping("/checkout")
-    public OrderEntity checkout(@RequestParam String sessionId, @RequestBody OrderEntity data) {
+    @Transactional
+    public ResponseEntity<OrderEntity> checkout(@RequestBody CheckoutRequest req) {
 
-        List<CartItem> cart = cartRepo.findBySessionId(sessionId);
-        if (cart.isEmpty()) {
-            throw new RuntimeException("Carrinho vazio.");
+        System.out.println(">>> RECEBIDO: " + req);
+
+        if (req.getSessionId() == null || req.getSessionId().isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
 
-        // Criar pedido
+        List<CartItem> cart = cartRepo.findBySessionId(req.getSessionId());
+        if (cart == null || cart.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // montar endereço
+        String fullAddress =
+                req.getStreet() + ", " +
+                req.getNumber() +
+                (req.getComplement() != null ? " - " + req.getComplement() : "") +
+                ", " + req.getRegion() +
+                ", CEP: " + req.getCep() +
+                (req.getReference() != null ? " (Ref: " + req.getReference() + ")" : "");
+
         OrderEntity order = new OrderEntity();
-        order.setName(data.getName());
-        order.setPhone(data.getPhone());
-        order.setAddress(data.getAddress());
+        order.setName(req.getName());
+        order.setPhone(req.getPhone());
+        order.setAddress(fullAddress);
+        order.setPaymentMethod(req.getPaymentMethod());
         order.setStatus("PENDING");
 
-        // Criar itens do pedido
+        // itens
         List<OrderItem> items = cart.stream().map(ci -> {
             OrderItem oi = new OrderItem();
             oi.setProduct(ci.getProduct());
             oi.setQuantity(ci.getQuantity());
-            oi.setPrice(ci.getProduct().getPrice());
+            oi.setPrice(ci.getPrice());
             oi.setOrder(order);
             return oi;
         }).collect(Collectors.toList());
 
         order.setItems(items);
 
-        // Calcular total
-        double total = items.stream()
+        double itemsTotal = items.stream()
                 .mapToDouble(i -> i.getPrice() * i.getQuantity())
                 .sum();
 
-        order.setTotal(total);
+        order.setTotal(itemsTotal);
 
-        // Salvar pedido
-        orderRepo.save(order);
+        OrderEntity saved = orderRepo.save(order);
 
-        // Limpar carrinho
-        cartRepo.deleteBySessionId(sessionId);
+        cartRepo.deleteBySessionId(req.getSessionId());
 
-        return order;
+        return ResponseEntity.ok(saved);
     }
 }

@@ -2,6 +2,7 @@ package com.example.lojazaplike.model;
 
 import javax.persistence.*;
 import lombok.*;
+
 import java.util.List;
 
 @Entity
@@ -13,11 +14,14 @@ public class OrderEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;          // Nome do cliente
-    private String phone;         // Telefone / WhatsApp
-    private String address;       // Endereço completo
+    private String name;
+    private String phone;
+    private String address;
+
+    private String paymentMethod;
 
     private Double total;
+
     private String status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
