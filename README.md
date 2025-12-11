@@ -1,51 +1,112 @@
-🛒 DeepSurvey Suplementos – Backend API
+🛠 DeepSurvey API — Backend (Spring Boot + MySQL + JWT)
 
-Backend oficial da aplicação DeepSurvey Suplementos, desenvolvido em Java + Spring Boot.
-É responsável por gerenciar produtos, categorias, carrinho, checkout e envio do pedido para o WhatsApp, além de fornecer APIs integradas ao frontend React.
+Este é o backend do sistema DeepSurvey Suplementos, uma plataforma completa de e-commerce com delivery por WhatsApp.
+A API fornece:
 
-🚀 Tecnologias utilizadas
+Cadastro e autenticação de usuários (JWT)
+
+Gerenciamento de produtos, categorias, fretes e configurações da loja
+
+Carrinho baseado em sessionId
+
+Finalização de pedido via WhatsApp
+
+Painel administrativo protegido por ROLE_ADMIN
+
+🚀 Tecnologias Utilizadas
 
 Java 17+
 
 Spring Boot
 
-Spring Web
-
-Spring Data JPA
-
 Spring Security + JWT
+
+Spring Data JPA / Hibernate
 
 MySQL
 
 Maven
 
-Hibernate
+📦 Funcionalidades da API
+🔐 Autenticação
 
-🔥 Principais Funcionalidades
+Login JWT
 
-Autenticação via JWT
+Validação automática do token
 
-CRUD completo de categorias
+Controle de roles:
 
-CRUD de produtos com suporte a ofertas
+ROLE_USER
 
-Carrinho baseado em sessionId (sem login)
+ROLE_ADMIN
 
-Checkout com cálculo de entrega
+🛍 Produtos
 
-Envio automático do pedido para WhatsApp
+CRUD completo
 
-Busca de produtos
+Preço promocional
 
-Listagem por categoria
+Suporte a múltiplas imagens
 
-Produtos em oferta (onSale, salePrice)
+🗂 Categorias
 
-⚙️ Configuração do Projeto
-1️⃣ Criar banco de dados MySQL
-CREATE DATABASE lojazap;
+CRUD
 
-2️⃣ Configurar o arquivo src/main/resources/application.properties
+Relacionamento 1:N com produtos
+
+🚚 Regiões de Entrega
+
+CRUD
+
+Controle de valor de frete
+
+Ativar/desativar regiões
+
+🏬 Configurações da Loja
+
+Logo
+
+Tema
+
+Cores
+
+Pedido mínimo
+
+WhatsApp
+
+Endereço
+
+Status da loja (aberto/fechado)
+
+🛒 Carrinho
+
+SessionId persistido pelo frontend
+
+Adicionar, atualizar, remover itens
+
+📦 Pedido (Checkout)
+
+Cálculo de subtotal + promoções
+
+Cálculo automático de frete
+
+Geração de mensagem formatada
+
+Retorno para integração com WhatsApp
+
+⚙️ Como Rodar o Projeto
+1️⃣ Pré-requisitos
+
+Java 17
+
+Maven
+
+MySQL
+
+2️⃣ Criar o Banco de Dados
+CREATE DATABASE lojazap CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+3️⃣ Configurar o application.properties
 spring.datasource.url=jdbc:mysql://localhost:3306/lojazap?useSSL=false&serverTimezone=UTC
 spring.datasource.username=root
 spring.datasource.password=root
@@ -53,7 +114,6 @@ spring.datasource.password=root
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 
-# Porta da API
 server.port=8083
 
 # JWT
@@ -61,66 +121,61 @@ app.jwt.secret=VerySecretJwtKeyChangeMe
 app.jwt.expirationMs=86400000
 
 
-⚠️ Se seu MySQL estiver em outra porta (ex.: 3307), ajuste no URL.
+⚠️ Importante: altere o JWT secret em produção.
 
-3️⃣ Rodar o projeto
-Via terminal:
+4️⃣ Rodar o Backend
 mvn spring-boot:run
 
-Ou via IDE:
-
-IntelliJ IDEA → Run
-
-Eclipse (STS) → Run as Spring Boot App
 
 A API iniciará em:
 
-👉 http://localhost:8083
+http://localhost:8083
 
-📡 Endpoints da API
-🔐 Autenticação
-Método	Endpoint	Descrição
-POST	/auth/register	Cria um novo usuário
-POST	/auth/login	Autentica e retorna JWT
-🗂️ Categorias
-Método	Endpoint	Descrição
-GET	/categories	Lista categorias
-POST	/categories	Cria categoria
-DELETE	/categories/{id}	Remove categoria
-📦 Produtos
-Método	Endpoint	Descrição
-GET	/products	Lista todos os produtos
-GET	/products/{id}	Detalhes por ID
-GET	/products/search?q=	Busca por nome
-GET	/products/category/{id}	Busca por categoria
-GET	/products/offers	Lista produtos em oferta
-POST	/products	Cria um produto
-PUT	/products/{id}	Atualiza produto
-DELETE	/products/{id}	Remove produto
-🛒 Carrinho
-Método	Endpoint	Descrição
-GET	/cart/{sessionId}	Lista itens
-POST	/cart/add	Adiciona item
-POST	/cart/update	Atualiza quantidade
-POST	/cart/remove	Remove item
-🧾 Checkout
-Método	Endpoint	Descrição
-POST	/orders/checkout	Finaliza pedido e envia para WhatsApp
-🔐 Segurança / JWT
+🧪 Endpoints Principais
+🔓 Públicos
+GET /products
+GET /products/{id}
+GET /products/search?q=
+GET /categories
+GET /store-config
+POST /cart/add
+POST /orders/checkout
 
-O backend utiliza JWT para autenticação de endpoints administrativos.
+🔐 Requer token (usuário logado)
+GET /cart/{sessionId}
+POST /cart/update
+POST /cart/remove
 
-Chave definida em:
+🔐 Requer ROLE_ADMIN
+POST/PUT/DELETE /products
+POST/PUT/DELETE /categories
+POST/PUT/DELETE /delivery-regions
+PUT /store-config/{id}
 
-app.jwt.secret=VerySecretJwtKeyChangeMe
+🧩 Estrutura de Pastas
+src/main/java/com/example/deepsurvey/
+│
+├── controller/        (controladores REST)
+├── model/             (entidades JPA)
+├── repository/        (interfaces JPA)
+├── service/           (regras de negócio)
+├── security/          (JWT, filtros, config de segurança)
+└── DeepsurveyApplication.java
 
+🔐 Segurança
 
-⚠️ Altere ESSA chave ao colocar em produção.
+Tokens gerados via HS512
 
-📌 Observações finais
+Roles armazenadas no payload JWT
 
-Este backend está totalmente integrado ao frontend da loja de suplementos DeepSurvey Suplementos.
+Apenas admin acessa rotas administrativas
 
-O sistema permite expansão simples para dashboard admin, relatórios, controle de estoque e gerenciamento de pedidos.
+Tokens enviados no header:
 
-Carrinho funciona mesmo sem login, baseado em sessionId.
+Authorization: Bearer {token}
+
+Considerações finais, esse proejeto teve continuidade porem por questão de segurança do site vou postar de forma aberta somente até aqui.
+
+📄 Licença
+
+MIT License.
