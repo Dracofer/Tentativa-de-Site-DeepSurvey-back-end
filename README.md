@@ -174,7 +174,7 @@ Tokens enviados no header:
 
 Authorization: Bearer {token}
 
-Considerações finais, esse proejeto teve continuidade porem por questão de segurança do site vou postar de forma aberta somente até aqui.
+Considerações finais: esse projeto teve continuidade porem por questão de segurança do site vou postar de forma aberta somente até aqui.
 
 📄 Licença
 
